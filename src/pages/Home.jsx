@@ -2,8 +2,6 @@ import { useContext } from "react";
 import AuthContext from "../context/AuthContext";
 import env from "dotenv";
 
-env.config();
-
 function Home() {
   const { user } = useContext(AuthContext);
 

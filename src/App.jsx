@@ -10,8 +10,6 @@ import axios from "axios";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import env from "dotenv";
 
-env.config();
-
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);

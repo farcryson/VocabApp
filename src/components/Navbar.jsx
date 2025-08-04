@@ -5,8 +5,6 @@ import { useContext } from "react";
 import axios from "axios";
 import env from "dotenv";
 
-env.config();
-
 function Navbar() {
   const { user } = useContext(AuthContext);
 

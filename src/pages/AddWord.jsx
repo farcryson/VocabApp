@@ -2,8 +2,6 @@ import { useState } from "react";
 import axios from "axios";
 import env from "dotenv";
 
-env.config();
-
 function AddWord() {
   const [word, setWord] = useState("");
   const [meaning, setMeaning] = useState("");
