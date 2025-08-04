@@ -3,14 +3,14 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import WordCard from "../components/WordCard";
 import AuthContext from "../context/AuthContext";
-import env from "dotenv";
 
 function Words() {
   const [words, setWords] = useState([]);
+  const backend = import.meta.env.VITE_BACKEND_URL;
 
   const fetchWords = () => {
     axios
-      .get(process.env.BACKEND_URL+"/words", {
+      .get(`${backend}/words`, {
         withCredentials: true,
       })
       .then((result) => {

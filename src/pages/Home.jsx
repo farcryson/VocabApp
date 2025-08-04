@@ -1,12 +1,13 @@
 import { useContext } from "react";
 import AuthContext from "../context/AuthContext";
-import env from "dotenv";
 
 function Home() {
   const { user } = useContext(AuthContext);
+  const backend = import.meta.env.VITE_BACKEND_URL;
+
 
   function handleLogin() {
-    window.location.href = process.env.BACKEND_URL+"/auth/google";
+    window.location.href = `${backend}/auth/google`;
   }
 
   return (

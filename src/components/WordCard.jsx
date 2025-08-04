@@ -1,15 +1,15 @@
 import axios from "axios";
 import { useState } from "react";
-import env from "dotenv";
 
 function WordCard({ item, onChange }) {
   const [isEditing, setEditing] = useState(false);
   const [editWord, setEditWord] = useState(item.word);
   const [editMeaning, setEditMeaning] = useState(item.meaning);
+  const backend = import.meta.env.VITE_BACKEND_URL;
 
   async function handleDelete() {
     try {
-      await axios.delete(process.env.BACKEND_URL+`/words/${item._id}`, {
+      await axios.delete(`${backend}/words/${item._id}`, {
         withCredentials: true,
       });
       onChange();

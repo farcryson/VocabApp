@@ -8,16 +8,16 @@ import { useEffect, useState } from "react";
 import AuthContext from "./context/AuthContext";
 import axios from "axios";
 import ProtectedRoute from "./routes/ProtectedRoute";
-import env from "dotenv";
 
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const backend = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     async function checkUser() {
       try {
-        const response = await axios.get(process.env.BACKEND_URL+"/user", {
+        const response = await axios.get(`${backend}/user`, {
           withCredentials: true,
         });
         setUser(response.data);

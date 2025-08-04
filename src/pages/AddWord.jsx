@@ -1,17 +1,17 @@
 import { useState } from "react";
 import axios from "axios";
-import env from "dotenv";
 
 function AddWord() {
   const [word, setWord] = useState("");
   const [meaning, setMeaning] = useState("");
+  const backend = import.meta.env.VITE_BACKEND_URL;
 
   function handleClick(event) {
     event.preventDefault();
     async function addWord() {
       try {
         const response = await axios.post(
-          process.env.BACKEND_URL+"/words",
+          `${backend}/words`,
           { word, meaning },
           { withCredentials: true }
         );

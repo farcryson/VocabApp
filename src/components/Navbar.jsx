@@ -3,14 +3,14 @@ import { FaSignOutAlt } from "react-icons/fa";
 import AuthContext from "../context/AuthContext";
 import { useContext } from "react";
 import axios from "axios";
-import env from "dotenv";
 
 function Navbar() {
   const { user } = useContext(AuthContext);
+  const backend = import.meta.env.VITE_BACKEND_URL;
 
   async function handleLogout() {
     try {
-      await axios.get(process.env.BACKEND_URL+"/logout", {
+      await axios.get(`${backend}/logout`, {
         withCredentials: true,
       });
       window.location.href = "/";
