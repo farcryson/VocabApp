@@ -11,7 +11,7 @@ import _ from "lodash";
 import MongoStore from "connect-mongo";
 
 const app = express();
-const port = 3000;
+const port = process.env.port || 3000;
 
 env.config();
 
