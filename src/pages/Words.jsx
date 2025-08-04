@@ -1,8 +1,7 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import WordCard from "../components/WordCard";
-import AuthContext from "../context/AuthContext";
 
 function Words() {
   const [words, setWords] = useState([]);
