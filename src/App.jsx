@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Words from "./pages/Words";
-import AddWord from "./pages/Addword";
+import AddWord from "./pages/AddWord";
 import { useEffect, useState } from "react";
 import AuthContext from "./context/AuthContext";
 import axios from "axios";
