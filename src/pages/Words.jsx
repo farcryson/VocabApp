@@ -9,7 +9,7 @@ function Words() {
 
   const fetchWords = () => {
     axios
-      .get("http://localhost:3000/words", {
+      .get(process.env.BACKEND_URL+"/words", {
         withCredentials: true,
       })
       .then((result) => {

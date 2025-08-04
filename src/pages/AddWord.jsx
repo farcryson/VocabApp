@@ -10,7 +10,7 @@ function AddWord() {
     async function addWord() {
       try {
         const response = await axios.post(
-          "http://localhost:3000/words",
+          process.env.BACKEND_URL+"/words",
           { word, meaning },
           { withCredentials: true }
         );

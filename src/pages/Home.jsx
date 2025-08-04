@@ -5,7 +5,7 @@ function Home() {
   const { user } = useContext(AuthContext);
 
   function handleLogin() {
-    window.location.href = "http://localhost:3000/auth/google";
+    window.location.href = process.env.BACKEND_URL+"/auth/google";
   }
 
   return (

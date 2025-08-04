@@ -21,7 +21,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-    mongoUrl: `mongodb+srv://${process.env.ATLAS_USERNAME}:${process.env.ATLAS_PASSWORD}@cluster0.jsjp4y3.mongodb.net/${process.env.ATLAS_DB}`, 
+    mongoUrl: process.env.MONGO_URL, 
     ttl: 14 * 24 * 60 * 60
   }),
     cookie: {
@@ -30,14 +30,14 @@ app.use(
   })
 );
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(express.json());
 app.use(passport.initialize());
 app.use(passport.session());
 
-mongoose.connect(`mongodb+srv://${process.env.ATLAS_USERNAME}:${process.env.ATLAS_PASSWORD}@cluster0.jsjp4y3.mongodb.net/${process.env.ATLAS_DB}`);
+mongoose.connect(process.env.MONGO_URL);
 
 const userSchema = new mongoose.Schema({
   googleId: String,
@@ -85,7 +85,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:3000/auth/google/words",
+      callbackURL: process.env.BACKEND_URL+"/auth/google/words",
       userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
     },
     function (accessToken, refreshToken, profile, cb) {
@@ -112,10 +112,10 @@ app.get(
 app.get(
   "/auth/google/words",
   passport.authenticate("google", {
-    failureRedirect: "http://localhost:5173/",
+    failureRedirect: process.env.FRONTEND_URL,
   }),
   function (req, res) {
-    res.redirect("http://localhost:5173/words");
+    res.redirect(process.env.FRONTEND_URL+"/words");
   }
 );
 
@@ -133,7 +133,7 @@ function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   }
-  res.redirect("http://localhost:5173/");
+  res.redirect(process.env.FRONTEND_URL);
 }
 
 app.get("/user", (req, res) => {

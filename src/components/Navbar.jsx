@@ -9,7 +9,7 @@ function Navbar() {
 
   async function handleLogout() {
     try {
-      await axios.get("http://localhost:3000/logout", {
+      await axios.get(process.env.BACKEND_URL+"/logout", {
         withCredentials: true,
       });
       window.location.href = "/";

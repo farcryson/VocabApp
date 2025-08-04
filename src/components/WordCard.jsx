@@ -8,7 +8,7 @@ function WordCard({ item, onChange }) {
 
   async function handleDelete() {
     try {
-      await axios.delete(`http://localhost:3000/words/${item._id}`, {
+      await axios.delete(process.env.BACKEND_URL+`/words/${item._id}`, {
         withCredentials: true,
       });
       onChange();
@@ -21,7 +21,7 @@ function WordCard({ item, onChange }) {
     event.preventDefault();
     try {
       await axios.patch(
-        `http://localhost:3000/words/${item._id}`,
+        process.env.BACKEND_URL+`/words/${item._id}`,
         { word: editWord.trim(), meaning: editMeaning.trim() },
         { withCredentials: true }
       );
