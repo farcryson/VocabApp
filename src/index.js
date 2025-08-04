@@ -8,6 +8,7 @@ import GoogleStrategy from "passport-google-oauth2";
 import env from "dotenv";
 import findOrCreate from "mongoose-findorcreate";
 import _ from "lodash";
+import MongoStore from "connect-mongo";
 
 const app = express();
 const port = 3000;
@@ -19,6 +20,10 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+    mongoUrl: `mongodb+srv://${process.env.ATLAS_USERNAME}:${process.env.ATLAS_PASSWORD}@cluster0.jsjp4y3.mongodb.net/${process.env.ATLAS_DB}`, 
+    ttl: 14 * 24 * 60 * 60
+  }),
     cookie: {
       maxAge: 1000 * 60 * 60 * 24,
     },
