@@ -6,11 +6,14 @@ function WordCard({ item, onChange }) {
   const [editWord, setEditWord] = useState(item.word);
   const [editMeaning, setEditMeaning] = useState(item.meaning);
   const backend = import.meta.env.VITE_BACKEND_URL;
+  // const backend = "http://localhost:3000";
 
   async function handleDelete() {
     try {
       await axios.delete(`${backend}/words/${item._id}`, {
-        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
       onChange();
     } catch (err) {
@@ -22,9 +25,13 @@ function WordCard({ item, onChange }) {
     event.preventDefault();
     try {
       await axios.patch(
-        process.env.BACKEND_URL+`/words/${item._id}`,
+        `${backend}/words/${item._id}`,
         { word: editWord.trim(), meaning: editMeaning.trim() },
-        { withCredentials: true }
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       setEditing(false);
       onChange();

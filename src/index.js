@@ -1,43 +1,23 @@
 import express from "express";
-import bodyParser from "body-parser";
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 import cors from "cors";
-import session from "express-session";
-import passport from "passport";
-import GoogleStrategy from "passport-google-oauth2";
-import env from "dotenv";
+import dotenv from "dotenv";
+import bodyParser from "body-parser";
+import { OAuth2Client } from "google-auth-library";
+import jwt from "jsonwebtoken";
 import findOrCreate from "mongoose-findorcreate";
 import _ from "lodash";
-import MongoStore from "connect-mongo";
+
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
+const frontend = process.env.FRONTEND_URL || "http://localhost:5173";
 
-env.config();
-
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URL, 
-    ttl: 14 * 24 * 60 * 60
-  }),
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 24,
-      sameSite: 'none',
-      secure: true
-    },
-  })
-);
-
-app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
+app.use(cors({ origin: frontend, credentials: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(express.json());
-app.use(passport.initialize());
-app.use(passport.session());
 
 mongoose.connect(process.env.MONGO_URL);
 
@@ -68,115 +48,81 @@ wordSchema.index({ word: 1, userId: 1 }, { unique: true });
 
 const Word = mongoose.model("word", wordSchema);
 
-passport.serializeUser(function (user, done) {
-  done(null, user.id);
-});
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-passport.deserializeUser(function (id, done) {
-  User.findById(id)
-    .then((user) => {
-      done(null, user);
-    })
-    .catch((err) => {
-      done(err, null);
-    });
-});
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader?.split(" ")[1];
 
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.BACKEND_URL+"/auth/google/words",
-      userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
-    },
-    function (accessToken, refreshToken, profile, cb) {
-      console.log(profile);
+  if (!token) return res.sendStatus(401);
 
-      User.findOrCreate(
-        { googleId: profile.id, name: profile.displayName },
-        function (err, user) {
-          return cb(err, user);
-        }
-      );
-    }
-  )
-);
-
-app.get(
-  "/auth/google",
-  passport.authenticate("google", {
-    scope: ["profile"],
-    prompt: "select_account",
-  })
-);
-
-app.get(
-  "/auth/google/words",
-  passport.authenticate("google", {
-    failureRedirect: process.env.FRONTEND_URL,
-  }),
-  function (req, res) {
-    res.redirect(process.env.FRONTEND_URL+"/words");
-  }
-);
-
-app.get("/logout", (req, res, next) => {
-  req.logout((err) => {
-    if (err) return next(err);
-    req.session.destroy(() => {
-      res.clearCookie("connect.sid", { path: "/" });
-      res.status(200).json({ message: "Looged out." });
-    });
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
   });
-});
-
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.redirect(process.env.FRONTEND_URL);
 }
 
-app.get("/user", (req, res) => {
-  if (req.isAuthenticated()) {
-    res.send(req.user);
-  } else {
-    res.status(401).send(null);
+app.post("/auth/google", async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { sub: googleId, name } = payload;
+
+    const user = await User.findOrCreate({ googleId, name }).then(r => r.doc);
+
+    const jwtToken = jwt.sign(
+      { id: user._id, name: user.name },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.json({ token: jwtToken, user: { id: user._id, name: user.name } });
+  } catch (err) {
+    console.error("Google Auth Error:", err);
+    res.sendStatus(403);
   }
+});
+
+app.get("/user", authenticateToken, (req, res) => {
+  res.json(req.user);
 });
 
 app
   .route("/words")
-  .get(ensureAuthenticated, (req, res) => {
+  .get(authenticateToken, (req, res) => {
     Word.find({ userId: req.user.id })
-      .then((result) => {
-        res.send(result);
-      })
-      .catch((err) => {
-        res.send(err);
-      });
+      .then((result) => res.send(result))
+      .catch((err) => res.status(500).send(err));
   })
-  .post(ensureAuthenticated, async (req, res) => {
+  .post(authenticateToken, async (req, res) => {
     try {
-      if(!req.body.word?.trim() || !req.body.meaning?.trim()){
-        return res.status(400).json({message:"Word or its meaning cannot be empty."})
+      if (!req.body.word?.trim() || !req.body.meaning?.trim()) {
+        return res.status(400).json({ message: "Word or meaning is empty" });
       }
+
       const trimmedWord = _.capitalize(req.body.word.trim());
       const existingWord = await Word.findOne({
         word: trimmedWord,
         userId: req.user.id,
       });
+
       if (existingWord) {
-        return res
-          .status(400)
-          .json({ message: "You already added this word." });
+        return res.status(400).json({ message: "Word already exists" });
       }
+
       const word = new Word({
         word: trimmedWord,
         meaning: req.body.meaning.trim(),
         userId: req.user.id,
       });
+
       const result = await word.save();
       res.status(200).json(result);
     } catch (err) {
@@ -184,48 +130,32 @@ app
       res.status(500).json({ message: "Something went wrong." });
     }
   })
-  .delete(ensureAuthenticated, (req, res) => {
+  .delete(authenticateToken, (req, res) => {
     Word.deleteMany({ userId: req.user.id })
-      .then((result) => {
-        res.send(result);
-      })
-      .catch((err) => {
-        res.send(err);
-      });
+      .then((result) => res.send(result))
+      .catch((err) => res.status(500).send(err));
   });
 
 app
   .route("/words/:wordId")
-  .get(ensureAuthenticated, (req, res) => {
-    Word.findOne({ _id: req.params.wordId })
-      .then((result) => {
-        res.send(result);
-      })
-      .catch((err) => {
-        res.send(err);
-      });
+  .get(authenticateToken, (req, res) => {
+    Word.findOne({ _id: req.params.wordId, userId: req.user.id })
+      .then((result) => res.send(result))
+      .catch((err) => res.status(500).send(err));
   })
-  .patch(ensureAuthenticated, (req, res) => {
+  .patch(authenticateToken, (req, res) => {
     Word.findOneAndUpdate(
-      { _id: req.params.wordId },
+      { _id: req.params.wordId, userId: req.user.id },
       { $set: req.body },
       { new: true }
     )
-      .then((result) => {
-        res.send(result);
-      })
-      .catch((err) => {
-        res.send(err);
-      });
+      .then((result) => res.send(result))
+      .catch((err) => res.status(500).send(err));
   })
-  .delete(ensureAuthenticated, (req, res) => {
-    Word.findByIdAndDelete({ _id: req.params.wordId })
-      .then((result) => {
-        res.send(result);
-      })
-      .catch((err) => {
-        res.send(err);
-      });
+  .delete(authenticateToken, (req, res) => {
+    Word.findOneAndDelete({ _id: req.params.wordId, userId: req.user.id })
+      .then((result) => res.send(result))
+      .catch((err) => res.status(500).send(err));
   });
 
 app.listen(port, () => {

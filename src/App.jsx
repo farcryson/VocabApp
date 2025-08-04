@@ -13,53 +13,63 @@ function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const backend = import.meta.env.VITE_BACKEND_URL;
+  // const backend = "http://localhost:3000";
+
 
   useEffect(() => {
     async function checkUser() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
       try {
         const response = await axios.get(`${backend}/user`, {
-          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
         setUser(response.data);
       } catch (err) {
-        console.log(err);
+        console.error("Auth check failed:", err);
+        localStorage.removeItem("token");
         setUser(null);
       } finally {
         setLoading(false);
       }
     }
+
     checkUser();
   }, []);
 
   return (
-    <>
-      {" "}
-      <AuthContext.Provider value={{ user, loading }}>
-        <BrowserRouter>
-          <Routes>
-            <Route element={<Layout />}>
-              <Route path="/" element={<Home />} />
-              <Route
-                path="/words"
-                element={
-                  <ProtectedRoute>
-                    <Words />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/add"
-                element={
-                  <ProtectedRoute>
-                    <AddWord />
-                  </ProtectedRoute>
-                }
-              />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </AuthContext.Provider>
-    </>
+    <AuthContext.Provider value={{ user, setUser, loading }}>
+      <BrowserRouter>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route
+              path="/words"
+              element={
+                <ProtectedRoute>
+                  <Words />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/add"
+              element={
+                <ProtectedRoute>
+                  <AddWord />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthContext.Provider>
   );
 }
 

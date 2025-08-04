@@ -5,12 +5,15 @@ import WordCard from "../components/WordCard";
 
 function Words() {
   const [words, setWords] = useState([]);
-  const backend = import.meta.env.VITE_BACKEND_URL;
+    const backend = import.meta.env.VITE_BACKEND_URL;
+  // const backend = "http://localhost:3000";
 
   const fetchWords = () => {
     axios
       .get(`${backend}/words`, {
-        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       })
       .then((result) => {
         setWords(result.data);

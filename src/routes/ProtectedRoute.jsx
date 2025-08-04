@@ -1,20 +1,15 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import AuthContext from "../context/AuthContext";
+import { Navigate } from "react-router-dom";
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useContext(AuthContext);
-  const backend = import.meta.env.VITE_BACKEND_URL;
-
-  useEffect(() => {
-    if (!loading && !user) {
-      window.location.href = `${backend}/auth/google`;
-    }
-  }, [loading, user]);
 
   if (loading) return <div>Loading...</div>;
   if (!user) {
-    return null;
+    return <Navigate to="/" replace />;
   }
+
   return children;
 }
 

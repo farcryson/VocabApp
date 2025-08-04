@@ -2,30 +2,37 @@ import { Link } from "react-router-dom";
 import { FaSignOutAlt } from "react-icons/fa";
 import AuthContext from "../context/AuthContext";
 import { useContext } from "react";
-import axios from "axios";
 
 function Navbar() {
-  const { user } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
   const backend = import.meta.env.VITE_BACKEND_URL;
+  // const backend = "http://localhost:3000";
 
-  async function handleLogout() {
-    try {
-      await axios.get(`${backend}/logout`, {
-        withCredentials: true,
-      });
-      window.location.href = "/";
-    } catch (err) {
-      console.log(err);
-    }
+  function handleLogout() {
+    localStorage.removeItem("token");
+    setUser(null);
+    window.location.href = "/";
   }
 
   return (
     <nav style={styles.nav}>
       <div>
-        <Link to="/" style={styles.link}>Home</Link>
-        {user && <Link to="/words" style={styles.link}>My Words</Link>}
+        <Link to="/" style={styles.link}>
+          Home
+        </Link>
+        {user && (
+          <Link to="/words" style={styles.link}>
+            My Words
+          </Link>
+        )}
       </div>
-      {user && <FaSignOutAlt onClick={handleLogout} style={styles.icon} title="Logout" />}
+      {user && (
+        <FaSignOutAlt
+          onClick={handleLogout}
+          style={styles.icon}
+          title="Logout"
+        />
+      )}
     </nav>
   );
 }

@@ -5,6 +5,7 @@ function AddWord() {
   const [word, setWord] = useState("");
   const [meaning, setMeaning] = useState("");
   const backend = import.meta.env.VITE_BACKEND_URL;
+  // const backend = "http://localhost:3000";
 
   function handleClick(event) {
     event.preventDefault();
@@ -13,15 +14,18 @@ function AddWord() {
         const response = await axios.post(
           `${backend}/words`,
           { word, meaning },
-          { withCredentials: true }
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
         );
         console.log(response.data);
       } catch (err) {
-        if(err.response && err.response.status === 400){
+        if (err.response && err.response.status === 400) {
           alert(err.response.data.message || "Duplicate Word");
-        }
-        else{
-          alert("Something went wrong. Please try again.")
+        } else {
+          alert("Something went wrong. Please try again.");
         }
         console.log(err);
       }
