@@ -32,7 +32,7 @@ app.use(express.json());
 app.use(passport.initialize());
 app.use(passport.session());
 
-mongoose.connect("mongodb://localhost:27017/vocabDB");
+mongoose.connect(`mongodb+srv://${process.env.ATLAS_USERNAME}:${process.env.ATLAS_PASSWORD}@cluster0.jsjp4y3.mongodb.net/${process.env.ATLAS_DB}`);
 
 const userSchema = new mongoose.Schema({
   googleId: String,
