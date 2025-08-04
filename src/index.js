@@ -11,7 +11,7 @@ import _ from "lodash";
 import MongoStore from "connect-mongo";
 
 const app = express();
-const port = process.env.port || 3000;
+const port = process.env.PORT || 3000;
 
 env.config();
 
@@ -184,7 +184,7 @@ app
     }
   })
   .delete(ensureAuthenticated, (req, res) => {
-    Word.deleteMany({})
+    Word.deleteMany({ userId: req.user.id })
       .then((result) => {
         res.send(result);
       })
