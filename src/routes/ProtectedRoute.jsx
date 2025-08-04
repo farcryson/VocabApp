@@ -1,5 +1,8 @@
 import { useContext } from "react";
 import AuthContext from "../context/AuthContext";
+import env from "dotenv";
+
+env.config();
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useContext(AuthContext);

@@ -3,6 +3,9 @@ import { FaSignOutAlt } from "react-icons/fa";
 import AuthContext from "../context/AuthContext";
 import { useContext } from "react";
 import axios from "axios";
+import env from "dotenv";
+
+env.config();
 
 function Navbar() {
   const { user } = useContext(AuthContext);

@@ -1,5 +1,8 @@
 import axios from "axios";
 import { useState } from "react";
+import env from "dotenv";
+
+env.config();
 
 function WordCard({ item, onChange }) {
   const [isEditing, setEditing] = useState(false);

@@ -3,6 +3,9 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import WordCard from "../components/WordCard";
 import AuthContext from "../context/AuthContext";
+import env from "dotenv";
+
+env.config();
 
 function Words() {
   const [words, setWords] = useState([]);
