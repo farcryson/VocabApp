@@ -8,8 +8,9 @@ function Home() {
   // const backend = "http://localhost:3000";
 
   useEffect(() => {
-    if (user) return;
+  if (user) return;
 
+  if (window.google?.accounts?.id) {
     window.google.accounts.id.initialize({
       client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
       callback: handleGoogleLogin,
@@ -19,7 +20,10 @@ function Home() {
       document.getElementById("google-btn"),
       { theme: "outline", size: "large" }
     );
-  }, [user]);
+  } else {
+    console.error("Google accounts SDK not loaded");
+  }
+}, [user]);
 
   async function handleGoogleLogin(response) {
     try {
