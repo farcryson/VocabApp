@@ -8,12 +8,14 @@ import { useEffect, useState } from "react";
 import AuthContext from "./context/AuthContext";
 import axios from "axios";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import Quiz from "./pages/Quiz";
 
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const backend = import.meta.env.VITE_BACKEND_URL;
   // const backend = "http://localhost:3000";
+  const [words, setWords] = useState([]);
 
 
   useEffect(() => {
@@ -44,8 +46,25 @@ function App() {
     checkUser();
   }, []);
 
+  const fetchWords = () => {
+      axios
+        .get(`${backend}/words`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
+        .then((result) => {
+          setWords(result.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
+
+    useEffect(()=>fetchWords(), []);
+
   return (
-    <AuthContext.Provider value={{ user, setUser, loading }}>
+    <AuthContext.Provider value={{ user, setUser, loading, setLoading, words, fetchWords }}>
       <BrowserRouter>
         <Routes>
           <Route element={<Layout />}>
@@ -63,6 +82,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <AddWord />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/quiz"
+              element={
+                <ProtectedRoute>
+                  <Quiz />
                 </ProtectedRoute>
               }
             />

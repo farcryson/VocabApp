@@ -1,29 +1,14 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useContext} from "react";
 import { Link } from "react-router-dom";
 import WordCard from "../components/WordCard";
+import AuthContext from "../context/AuthContext";
 
 function Words() {
-  const [words, setWords] = useState([]);
-    const backend = import.meta.env.VITE_BACKEND_URL;
+  const backend = import.meta.env.VITE_BACKEND_URL;
   // const backend = "http://localhost:3000";
+  const {words, fetchWords} = useContext(AuthContext);
+  
 
-  const fetchWords = () => {
-    axios
-      .get(`${backend}/words`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
-      .then((result) => {
-        setWords(result.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  useEffect(() => fetchWords(), []);
 
   return (
     <div style={{ padding: "1rem" }}>

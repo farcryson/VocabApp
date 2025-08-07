@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
+import _ from "lodash";
 
 function WordCard({ item, onChange }) {
   const [isEditing, setEditing] = useState(false);
@@ -26,7 +27,7 @@ function WordCard({ item, onChange }) {
     try {
       await axios.patch(
         `${backend}/words/${item._id}`,
-        { word: editWord.trim(), meaning: editMeaning.trim() },
+        { word: _.capitalize(editWord.trim()), meaning: editMeaning.trim() },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,

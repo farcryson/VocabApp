@@ -38,6 +38,8 @@ const wordSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  correctCount: Number,
+  incorrectCount: Number,
   userId: {
     type: String,
     required: true,
@@ -120,6 +122,8 @@ app
       const word = new Word({
         word: trimmedWord,
         meaning: req.body.meaning.trim(),
+        correctCount: 0,
+        incorrectCount: 0,
         userId: req.user.id,
       });
 

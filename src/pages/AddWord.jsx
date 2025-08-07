@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import axios from "axios";
+import AuthContext from "../context/AuthContext";
 
 function AddWord() {
   const [word, setWord] = useState("");
   const [meaning, setMeaning] = useState("");
   const backend = import.meta.env.VITE_BACKEND_URL;
   // const backend = "http://localhost:3000";
+  const { words, fetchWords } = useContext(AuthContext);
 
   function handleClick(event) {
     event.preventDefault();
@@ -21,6 +23,9 @@ function AddWord() {
           }
         );
         console.log(response.data);
+        fetchWords();
+        setWord("");
+        setMeaning("");
       } catch (err) {
         if (err.response && err.response.status === 400) {
           alert(err.response.data.message || "Duplicate Word");
@@ -31,8 +36,6 @@ function AddWord() {
       }
     }
     addWord();
-    setWord("");
-    setMeaning("");
   }
 
   return (

@@ -21,9 +21,14 @@ function Navbar() {
           Home
         </Link>
         {user && (
+          <>
           <Link to="/words" style={styles.link}>
             My Words
           </Link>
+          <Link to="/quiz" style={styles.link}>
+            Quiz
+          </Link>
+          </>
         )}
       </div>
       {user && (
