@@ -3,17 +3,12 @@ import AuthContext from "../context/AuthContext";
 import QuizCard from "../components/QuizCard";
 
 function Quiz() {
-  const { words, fetchWords } = useContext(AuthContext);
+  const { words, fetchWords, loading, setLoading } = useContext(AuthContext);
   const [quizData, setQuizData] = useState(null);
 
   useEffect(() => {
-    if (words.length === 0) return;
-    loadQuestion();
+    if (words.length > 0) loadQuestion();
   }, [words]);
-
-  if (words.length === 0) {
-    return <div>Loading...</div>;
-  }
 
   function shuffle(a) {
     for (let i = a.length - 1; i >= 0; i--) {
@@ -23,6 +18,7 @@ function Quiz() {
     return a;
   }
   function loadQuestion() {
+    setLoading(true);
     let currentWord = null;
     let sum = 0;
     for (const word of words) {
@@ -36,7 +32,7 @@ function Quiz() {
       const total_attempts = word.correctCount + word.incorrectCount;
       const weight = (1 / (1 + total_attempts)) * (1 + word.incorrectCount);
       w += weight;
-      if (w >= rand){
+      if (w >= rand) {
         currentWord = word;
         break;
       }
@@ -49,20 +45,21 @@ function Quiz() {
       .map((w) => w.meaning);
     const options = shuffle([...wrongOptions, currentWord.meaning]);
     setQuizData({
-      currentWord: currentWord,
-      options: options,
+      currentWord,
+      options,
     });
+    setLoading(false);
   }
 
-  return (
-    <>
-      {quizData ? (
-        <QuizCard quizData={quizData} loadQuestion={loadQuestion} />
-      ) : (
-        <div>Next Question...</div>
-      )}
-    </>
-  );
+  if (words.length === 0) {
+    return <div style={{ padding: "1rem" }}>Fetching words...</div>;
+  }
+
+  if (loading || !quizData) {
+    return <div style={{ padding: "1rem" }}>Loading question...</div>;
+  }
+
+  return <QuizCard quizData={quizData} loadQuestion={loadQuestion} />;
 }
 
 export default Quiz;

@@ -13,8 +13,8 @@ import Quiz from "./pages/Quiz";
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const backend = import.meta.env.VITE_BACKEND_URL;
-  // const backend = "http://localhost:3000";
+  // const backend = import.meta.env.VITE_BACKEND_URL;
+  const backend = "http://localhost:3000";
   const [words, setWords] = useState([]);
 
 
@@ -61,7 +61,14 @@ function App() {
         });
     };
 
-    useEffect(()=>fetchWords(), []);
+    useEffect(()=>{
+      if(user) fetchWords();
+    },[user]
+    );
+
+    if(loading){
+      return <div style={{padding:"1rem", textAlign:"center"}}>Checking login...</div>;
+    }
 
   return (
     <AuthContext.Provider value={{ user, setUser, loading, setLoading, words, fetchWords }}>

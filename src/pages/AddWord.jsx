@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import axios from "axios";
 import AuthContext from "../context/AuthContext";
+import "../styles/AddWord.css"
 
 function AddWord() {
   const [word, setWord] = useState("");
@@ -39,9 +40,9 @@ function AddWord() {
   }
 
   return (
-    <div style={{ padding: "1rem", maxWidth: "400px", margin: "auto" }}>
+    <div className="add-container">
       <h2>Add a Word</h2>
-      <form style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+      <form className="add-form">
         <input
           type="text"
           name="word"

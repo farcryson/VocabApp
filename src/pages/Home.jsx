@@ -4,26 +4,38 @@ import axios from "axios";
 
 function Home() {
   const { user } = useContext(AuthContext);
-    const backend = import.meta.env.VITE_BACKEND_URL;
+  const backend = import.meta.env.VITE_BACKEND_URL;
   // const backend = "http://localhost:3000";
 
   useEffect(() => {
-  if (user) return;
+    if (user) return;
 
-  if (window.google?.accounts?.id) {
-    window.google.accounts.id.initialize({
-      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-      callback: handleGoogleLogin,
-    });
+    const checkGoogleScriptLoaded = setInterval(() => {
+      const gisId = window.google?.accounts?.id;
 
-    window.google.accounts.id.renderButton(
-      document.getElementById("google-btn"),
-      { theme: "outline", size: "large" }
-    );
-  } else {
-    console.error("Google accounts SDK not loaded");
-  }
-}, [user]);
+      if (gisId) {
+        clearInterval(checkGoogleScriptLoaded);
+
+        gisId.initialize({
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+          callback: handleGoogleLogin,
+        });
+
+        gisId.renderButton(document.getElementById("google-btn"), {
+          theme: "outline",
+          size: "large",
+        });
+      }
+    }, 500);
+    const stopRetryTimeout = setTimeout(() => {
+      clearInterval(checkGoogleScriptLoaded);
+    }, 5000);
+
+    return () => {
+      clearInterval(checkGoogleScriptLoaded);
+      clearTimeout(stopRetryTimeout);
+    };
+  }, [user]);
 
   async function handleGoogleLogin(response) {
     try {
@@ -46,6 +58,5 @@ function Home() {
     </div>
   );
 }
-
 
 export default Home;

@@ -1,20 +1,26 @@
 import { useContext, useState } from "react";
 import axios from "axios";
 import AuthContext from "../context/AuthContext";
+import "../styles/QuizCard.css";
 
-function QuizCard({ quizData, loadQuestion }) {
-  const currentWord = quizData.currentWord;
-  const options = quizData.options;
+function QuizCard({ quizData }) {
+  const { currentWord, options } = quizData;
   const [selected, setSelected] = useState(null);
+  const [answered, setAnswered] = useState(false);
+  const [score, setScore] = useState(0);
   const backend = import.meta.env.VITE_BACKEND_URL;
   // const backend = "http://localhost:3000";
-  const {fetchWords} = useContext(AuthContext);
+  const { fetchWords } = useContext(AuthContext);
 
   async function handleSelect(choice) {
-    if (selected !== null) return;
+    if (answered) return;
+
     setSelected(choice);
+    setAnswered(true);
+
     if (choice === currentWord.meaning) {
       currentWord.correctCount += 1;
+      setScore(score + 1);
     } else {
       currentWord.incorrectCount += 1;
     }
@@ -36,63 +42,52 @@ function QuizCard({ quizData, loadQuestion }) {
     }
   }
 
-  function handleNext() {
-    setSelected(null);
-    fetchWords();
-  }
+  const isCorrect = (option) => option === currentWord.meaning;
 
   return (
-    <div style={styles.card}>
-      <h2>{currentWord.word}</h2>
-      <div style={styles.options}>
-        {options.map((option, index) => {
-          return (
-            <button
-              key={index}
-              onClick={() => handleSelect(option)}
-              disabled={selected !== null}
-              style={{
-                ...styles.button,
-                backgroundColor:
-                  selected === option
-                    ? option === currentWord.meaning
-                      ? "#c8f7c5"
-                      : "#f7c5c5"
-                    : "",
-              }}
-            >
-              {option}
-            </button>
-          );
-        })}
-      </div>
-      {selected && <button onClick={handleNext}>Next</button>}
+    <div className="quiz-card">
+      <h2 className="quiz-word">{currentWord.word}</h2>
+
+      {options.map((option, index) => {
+        const isSelected = selected === option;
+        const isRight = isCorrect(option);
+        const showCorrect = answered && isRight;
+        const showWrong = answered && isSelected && !isRight;
+
+        return (
+          <button
+            key={index}
+            onClick={() => handleSelect(option)}
+            disabled={answered}
+            className={`quiz-option ${
+              showCorrect ? "correct" : showWrong ? "incorrect" : ""
+            }`}
+          >
+            {option}
+          </button>
+        );
+      })}
+      {selected && (
+        <button
+          onClick={() => {
+            setSelected(null);
+            setAnswered(false);
+            fetchWords();
+          }}
+          className="next-button"
+        >
+          Next
+        </button>
+      )}
+      <p
+        style={{
+          color: "black",
+        }}
+      >
+        Score: {score}
+      </p>
     </div>
   );
 }
-
-const styles = {
-  card: {
-    border: "1px solid #ccc",
-    padding: "1rem",
-    borderRadius: "8px",
-    maxWidth: "500px",
-    margin: "auto",
-    textAlign: "center",
-  },
-  options: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "1rem",
-    marginTop: "1rem",
-  },
-  button: {
-    padding: "0.5rem",
-    borderRadius: "6px",
-    border: "1px solid #aaa",
-    fontSize: "1rem",
-    cursor: "pointer",
-  },
-};
 
 export default QuizCard;

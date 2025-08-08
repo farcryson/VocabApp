@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import _ from "lodash";
+import "../styles/WordCard.css"
 
 function WordCard({ item, onChange }) {
   const [isEditing, setEditing] = useState(false);
@@ -48,9 +49,9 @@ function WordCard({ item, onChange }) {
   }
 
   return (
-    <div style={card}>
+    <div className="word-card">
       {isEditing ? (
-        <form style={form}>
+        <form className="edit-form">
           <input
             type="text"
             value={editWord}
@@ -61,46 +62,22 @@ function WordCard({ item, onChange }) {
             value={editMeaning}
             onChange={(e) => setEditMeaning(e.target.value)}
           />
-          <div style={btnRow}>
+          <div className="edit-btn-row">
             <button onClick={handleEdit}>Save</button>
             <button onClick={handleCancel}>Cancel</button>
           </div>
         </form>
       ) : (
-        // <>
-        //   <h3 style={{ color: 'black' }}>{item.word}</h3>
-        //   <p style={{ color: 'black' }}>{item.meaning}</p>
-        //   <div style={btnRow}>
-        //     <button onClick={handleDelete}>Delete</button>
-        //     <button onClick={() => setEditing(true)}>Edit</button>
-        //   </div>
-        // </>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <table className="words-table">
           <tbody>
             <tr>
-              <td
-                style={{
-                  border: "1px solid #ccc",
-                  padding: "8px",
-                  color: "black",
-                }}
-              >
-                {item.word}
-              </td>
-              <td
-                style={{
-                  border: "1px solid #ccc",
-                  padding: "8px",
-                  color: "black",
-                }}
-              >
-                {item.meaning}
-              </td>
-              <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+              <td className="word-cell">{item.word}</td>
+              <td className="word-cell">{item.meaning}</td>
+              <td className="word-cell">
                 <button onClick={handleDelete}>Delete</button>
                 <button
                   onClick={() => setEditing(true)}
-                  style={{ marginLeft: "8px" }}
+                  className="edit-button"
                 >
                   Edit
                 </button>
@@ -113,25 +90,5 @@ function WordCard({ item, onChange }) {
   );
 }
 
-const card = {
-  border: "1px solid #ccc",
-  padding: "1rem",
-  margin: "1rem auto",
-  borderRadius: "8px",
-  maxWidth: "400px",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-  background: "#fdfdfd",
-};
-
-const form = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "0.5rem",
-};
-
-const btnRow = {
-  display: "flex",
-  gap: "0.5rem",
-};
 
 export default WordCard;

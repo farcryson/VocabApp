@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { FaSignOutAlt } from "react-icons/fa";
 import AuthContext from "../context/AuthContext";
 import { useContext } from "react";
+import "../styles/Navbar.css";
 
 function Navbar() {
   const { user, setUser } = useContext(AuthContext);
@@ -15,53 +16,31 @@ function Navbar() {
   }
 
   return (
-    <nav style={styles.nav}>
-      <div>
-        <Link to="/" style={styles.link}>
+    <nav className="nav">
+      <div className="nav-links">
+        <Link to="/" className="nav-link">
           Home
         </Link>
         {user && (
           <>
-          <Link to="/words" style={styles.link}>
-            My Words
-          </Link>
-          <Link to="/quiz" style={styles.link}>
-            Quiz
-          </Link>
+            <Link to="/words" className="nav-link">
+              My Words
+            </Link>
+            <Link to="/quiz" className="nav-link">
+              Quiz
+            </Link>
           </>
         )}
       </div>
       {user && (
         <FaSignOutAlt
           onClick={handleLogout}
-          style={styles.icon}
+          className="logout-icon"
           title="Logout"
         />
       )}
     </nav>
   );
 }
-
-const styles = {
-  nav: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "1rem 2rem",
-    background: "#f5f5f5",
-    borderBottom: "1px solid #ddd",
-  },
-  link: {
-    marginRight: "1rem",
-    textDecoration: "none",
-    color: "#333",
-    fontWeight: "bold",
-  },
-  icon: {
-    cursor: "pointer",
-    color: "#c00",
-    fontSize: "1.2rem",
-  },
-};
 
 export default Navbar;
