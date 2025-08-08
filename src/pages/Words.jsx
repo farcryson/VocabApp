@@ -8,7 +8,9 @@ function Words() {
   // const backend = "http://localhost:3000";
   const {words, fetchWords} = useContext(AuthContext);
   
-
+  if (words.length === 0) {
+    return <div style={{ padding: "1rem" }}>Fetching words...</div>;
+  }
 
   return (
     <div style={{ padding: "1rem" }}>
