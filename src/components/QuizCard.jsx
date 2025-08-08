@@ -45,28 +45,32 @@ function QuizCard({ quizData }) {
   const isCorrect = (option) => option === currentWord.meaning;
 
   return (
-    <div className="quiz-card">
-      <h2 className="quiz-word">{currentWord.word}</h2>
+    <>
+    <div className="container">
+      <h2 className="score">Score: {score}</h2>
+      <h2 className="word">{currentWord.word}</h2>
+      <div className="options">
+        {options.map((option, index) => {
+          const isSelected = selected === option;
+          const isRight = isCorrect(option);
+          const showCorrect = answered && isRight;
+          const showWrong = answered && isSelected && !isRight;
 
-      {options.map((option, index) => {
-        const isSelected = selected === option;
-        const isRight = isCorrect(option);
-        const showCorrect = answered && isRight;
-        const showWrong = answered && isSelected && !isRight;
-
-        return (
-          <button
-            key={index}
-            onClick={() => handleSelect(option)}
-            disabled={answered}
-            className={`quiz-option ${
-              showCorrect ? "correct" : showWrong ? "incorrect" : ""
-            }`}
-          >
-            {option}
-          </button>
-        );
-      })}
+          return (
+            <button
+              key={index}
+              onClick={() => handleSelect(option)}
+              disabled={answered}
+              className={`option-button ${
+                showCorrect ? "correct" : showWrong ? "incorrect" : ""
+              }`}
+            >
+              {option}
+            </button>
+          );
+        })}
+      </div>
+      </div>
       {selected && (
         <button
           onClick={() => {
@@ -79,14 +83,7 @@ function QuizCard({ quizData }) {
           Next
         </button>
       )}
-      <p
-        style={{
-          color: "black",
-        }}
-      >
-        Score: {score}
-      </p>
-    </div>
+      </>
   );
 }
 

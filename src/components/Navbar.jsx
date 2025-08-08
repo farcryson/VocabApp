@@ -29,6 +29,9 @@ function Navbar() {
             <Link to="/quiz" className="nav-link">
               Quiz
             </Link>
+            <Link to="/short" className="nav-link">
+              Short Answer
+            </Link>
           </>
         )}
       </div>

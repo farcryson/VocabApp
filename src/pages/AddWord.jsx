@@ -40,9 +40,9 @@ function AddWord() {
   }
 
   return (
-    <div className="add-container">
+    <div className="container">
       <h2>Add a Word</h2>
-      <form className="add-form">
+      <form className="form">
         <input
           type="text"
           name="word"

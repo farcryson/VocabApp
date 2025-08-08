@@ -9,6 +9,7 @@ import AuthContext from "./context/AuthContext";
 import axios from "axios";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Quiz from "./pages/Quiz";
+import ShortAnswer from "./pages/ShortAnswer";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -97,6 +98,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Quiz />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/short"
+              element={
+                <ProtectedRoute>
+                  <ShortAnswer />
                 </ProtectedRoute>
               }
             />
