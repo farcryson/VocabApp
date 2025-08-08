@@ -13,8 +13,8 @@ import Quiz from "./pages/Quiz";
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  // const backend = import.meta.env.VITE_BACKEND_URL;
-  const backend = "http://localhost:3000";
+  const backend = import.meta.env.VITE_BACKEND_URL;
+  // const backend = "http://localhost:3000";
   const [words, setWords] = useState([]);
 
 
