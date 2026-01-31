@@ -10,7 +10,7 @@ A smart learning application that uses a weighted probability algorithm to optim
 * **Auth:** Google OAuth 2.0 + JWT
 
 ## Key Features
-* **Weighted Spaced Repetition:** Implemented a custom selection algorithm ($Probability \propto \frac{1}{1 + TotalAttempts} \times (1 + IncorrectCount)$) that prioritizes difficult words during quiz sessions.
+* **Weighted Spaced Repetition:** Implemented a custom selection algorithm $$\text{Probability} \propto \frac{1}{1 + \text{TotalAttempts}} \times (1 + \text{IncorrectCount})$$ that prioritizes difficult words during quiz sessions.
 * **Hybrid Quiz Modes:**
   * **Recognition Mode:** Multiple choice questions for new or difficult words.
   * **Recall Mode:** Short-answer input with self-verification logic for mastered words.
